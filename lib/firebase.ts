@@ -7,7 +7,7 @@ import { getFirestore } from "@firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyA3D1GX02DAv-6Tk-hdVKd0rkRgcz_gXEM",
+  apiKey: `${process.env.NEXT_PUBLIC_DATABASE_URL}`,
   authDomain: "emr-v1-test-ff55e.firebaseapp.com",
   projectId: "emr-v1-test-ff55e",
   storageBucket: "emr-v1-test-ff55e.appspot.com",
