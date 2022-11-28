@@ -12,7 +12,9 @@ import LockPersonOutlinedIcon from '@mui/icons-material/LockPersonOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { FormEventHandler, useState } from 'react';
-import {signIn} from 'next-auth/react'
+import { useAuth } from '../../context/AuthContext';
+import { useSignin } from '../../hooks/useSignin';
+import {useRouter} from 'next/router'
 
 function Copyright(props: any) {
   return (
@@ -30,16 +32,32 @@ function Copyright(props: any) {
 const theme = createTheme();
 
 export default function SignInSide() {
+  const router = useRouter()
+  const {user} = useAuth()
+  const {error , isPending, signin} = useSignin()
   const [userInfo, setUserInfo] = useState({email: '', password: ''});
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
-    const res = await signIn('credentials', {
-        email: userInfo.email,
-        password: userInfo.password,
-        redirect: false,
-    });
-    console.log(res)
+    signin(userInfo.email, userInfo.password)
   };
+
+  if(isPending) {
+    return (
+      <Typography component="h1" variant="h5">
+        Loading...
+      </Typography>
+    )
+  }
+  if(error){
+    return (
+      <Typography component="h1" variant="h5">
+        {error}
+      </Typography>
+    )
+  }
+  if(user){
+    router.push(`/dashboard/${user?.uid}`)
+  }
 
   return (
     <ThemeProvider theme={theme}>

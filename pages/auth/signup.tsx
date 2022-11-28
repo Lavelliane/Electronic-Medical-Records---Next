@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -14,11 +14,9 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSignup } from "../../hooks/useSignup";
 import { red } from '@mui/material/colors';
+import { useAuth } from "../../context/AuthContext";
+import {  useRouter } from "next/router";
 
-interface UserCredentials {
-  email: string;
-  password: string;
-}
 
 function Copyright(props: any) {
   return (
@@ -41,14 +39,22 @@ function Copyright(props: any) {
 const theme = createTheme();
 
 export default function SignUp() {
+  const {user, logout} = useAuth();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const { signup, isPending, error } = useSignup();
+  const router = useRouter()
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    signup(email, password);
+    await signup(email, password);
   };
+  useEffect(() => {
+    if(user){
+      router.push(`/dashboard/${user?.uid}`)
+    }
+  }, [])
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -115,7 +121,6 @@ export default function SignUp() {
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
-                
               >
                 Sign Up
               </Button>
