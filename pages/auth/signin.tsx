@@ -15,6 +15,7 @@ import { FormEventHandler, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useSignin } from '../../hooks/useSignin';
 import {useRouter} from 'next/router'
+import { red } from '@mui/material/colors';
 
 function Copyright(props: any) {
   return (
@@ -45,13 +46,6 @@ export default function SignInSide() {
     return (
       <Typography component="h1" variant="h5">
         Loading...
-      </Typography>
-    )
-  }
-  if(error){
-    return (
-      <Typography component="h1" variant="h5">
-        {error}
       </Typography>
     )
   }
@@ -122,6 +116,9 @@ export default function SignInSide() {
                 control={<Checkbox value="remember" color="primary" />}
                 label="Remember me"
               />
+              {error && <Typography component="p" variant="body2" color={red[400]}>
+                  {error}
+              </Typography>}
               <Button
                 type="submit"
                 fullWidth
