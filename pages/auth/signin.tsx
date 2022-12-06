@@ -50,7 +50,7 @@ export default function SignInSide() {
     )
   }
   if(user){
-    router.push(`/dashboard/${user?.uid}`)
+    router.push(`/dashboard/`)
   }
 
   return (

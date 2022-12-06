@@ -1,6 +1,7 @@
 import {useState} from 'react';
-import {auth} from '../lib/firebase'
+import {auth, db} from '../lib/firebase'
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { setDoc, doc } from "firebase/firestore";
 
 export const useSignup = () => {
     const [error, setError] = useState(null)
@@ -12,13 +13,16 @@ export const useSignup = () => {
    
         await createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                const user = userCredential.user;
-                setError(null);
+                setDoc(doc(db, 'users', userCredential.user.uid), {
+                    email,
+                    appointments: [],
+                    results: [],
+                })
             })
             .catch((error) => {
                 console.log(error.code);
                 console.log(error.message);
-                setError(error.message)
+                setError(error.message);
             });       
         setIsPending(false);
     }

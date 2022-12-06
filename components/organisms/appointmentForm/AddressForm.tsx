@@ -55,6 +55,7 @@ export default function AddressForm({patientFunc}: Prop) {
               value={date}
               onChange={handleChange}
               renderInput={(params) => <TextField {...params} fullWidth />}
+              minDate={dayjs()}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
