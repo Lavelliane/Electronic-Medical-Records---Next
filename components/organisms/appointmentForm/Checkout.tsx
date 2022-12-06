@@ -20,7 +20,9 @@ import { useRouter } from "next/router";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { db } from "../../../lib/firebase";
 import { PatientDetails } from "../../../types/types";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { useAuth } from '../../../context/AuthContext';
+import { uuid } from 'uuidv4';
 
 function Copyright() {
   return (
@@ -40,6 +42,7 @@ const steps = ["Patient Information", "Payment details", "Review"];
 const theme = createTheme();
 
 export default function Checkout() {
+ const {user} = useAuth()
   const [patient, setPatient] = useState<PatientDetails | null>(null);
   const { asPath } = useRouter();
   const id = asPath.split("/")[2];
@@ -47,6 +50,7 @@ export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
 
   const [value, loading, error] = useDocument(doc(db, "services", id));
+  
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -58,10 +62,25 @@ export default function Checkout() {
   console.log(patient);
 
   async function addDataToAppointments(id: string) {
-    await setDoc(doc(db, "appointments", id), {
+    const appointmentId = uuid().slice(0,10)
+    await setDoc(doc(db, "appointments", appointmentId), {
       ...patient,
       date: patient?.date?.toString(),
+      serviceId: id,
+      serviceTitle: value?.data()?.title,
+      userId: user?.uid
     });
+    if(user?.uid !== null){
+        //get current appointment array of target user
+        const docRef = doc(db, "users", user?.uid);
+        const docSnap = await getDoc(docRef);
+
+        //update array
+        await updateDoc(doc(db, "users", user?.uid), {
+            appointments: [...docSnap?.data()?.appointments, appointmentId]
+        });
+    }
+    
     handleNext();
   }
 
@@ -126,13 +145,15 @@ export default function Checkout() {
                     Back
                   </Button>
                 )}
-                <Button
-                  variant="contained"
-                  onClick={handleNext}
-                  sx={{ mt: 3, ml: 1 }}
-                >
-                  Next
-                </Button>
+                {activeStep !== steps.length - 1 && (
+                  <Button
+                    variant="contained"
+                    onClick={handleNext}
+                    sx={{ mt: 3, ml: 1 }}
+                  >
+                    Next
+                  </Button>
+                )}
                 {activeStep === steps.length - 1 && (
                   <Button
                     variant="contained"
