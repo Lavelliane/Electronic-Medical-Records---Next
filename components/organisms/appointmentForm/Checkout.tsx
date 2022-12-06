@@ -22,7 +22,7 @@ import { db } from "../../../lib/firebase";
 import { PatientDetails } from "../../../types/types";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { useAuth } from '../../../context/AuthContext';
-import { uuid } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 
 function Copyright() {
   return (
@@ -62,7 +62,7 @@ export default function Checkout() {
   console.log(patient);
 
   async function addDataToAppointments(id: string) {
-    const appointmentId = uuid().slice(0,10)
+    const appointmentId = uuidv4().slice(0,10)
     await setDoc(doc(db, "appointments", appointmentId), {
       ...patient,
       date: patient?.date?.toString(),
@@ -76,8 +76,15 @@ export default function Checkout() {
         const docSnap = await getDoc(docRef);
 
         //update array
+        const appointmentData = {
+            appointmentId,
+            title: value?.data()?.title,
+            date: patient?.date?.toString(),
+            price: value?.data()?.price,
+        }
+        console.log(appointmentData)
         await updateDoc(doc(db, "users", user?.uid), {
-            appointments: [...docSnap?.data()?.appointments, appointmentId]
+            appointments: [...docSnap?.data()?.appointments, appointmentData]
         });
     }
     

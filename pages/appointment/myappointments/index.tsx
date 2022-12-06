@@ -25,15 +25,10 @@ import { mainListItems } from "../../../components/atoms/ListItems";
 import { yellow } from "@mui/material/colors";
 import axios from "axios";
 import { GetServerSideProps } from "next";
-import {
-  collection,
-  doc,
-  DocumentData,
-  getDocs,
-  onSnapshot,
-} from "firebase/firestore";
+import { getFirestore, doc, getDoc, DocumentData } from "firebase/firestore";
+import { useDocument } from "react-firebase-hooks/firestore";
 import { db } from "../../../lib/firebase";
-
+import MyAppointmentsCard from "../../../components/atoms/MyAppointmentsCard";
 
 type Category = {
   name: string;
@@ -119,11 +114,10 @@ const Drawer = styled(MuiDrawer, {
 const mdTheme = createTheme();
 
 export default function Dashboard() {
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const handleOpen = () => setModalOpen(true);
-  const handleClose = () => setModalOpen(false);
+
   const router = useRouter();
   const { user, logout } = useAuth();
+  const [value, setValue] = useState<DocumentData>()
 
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
@@ -138,21 +132,22 @@ export default function Dashboard() {
     }
   }, []);
 
-  const [docs, setdocs] = useState<DocumentData>([]);
-
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "services"), (querySnapshot) => {
-      const documents = querySnapshot.docs.map((doc) => {
-        return {
-          ...doc.data(),
-          id: doc.id,
-        };
-      });
-      setdocs(documents);
-    });
-    return () => unsub();
-  }, []);
-
+    async function getDocs(){
+        const docRef = doc(db, 'users', user?.uid)
+        const docSnap = await getDoc(docRef);
+        if(docSnap.exists() && user?.uid !== null) {
+            setAppointments(docSnap.data().appointments);
+        } else {
+            // doc.data() will be undefined in this case
+            console.log("No such document!");
+        }
+    }
+    getDocs()
+  },[])
+  
+  const [appointments, setAppointments] = useState<any>([])
+  
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: "flex" }}>
@@ -228,11 +223,10 @@ export default function Dashboard() {
             overflow: "auto",
           }}
         >
-          <Toolbar />
-          
+          <Toolbar /> 
+            <MyAppointmentsCard serviceDocId={appointments} />
         </Box>
-      </Box> 
+      </Box>
     </ThemeProvider>
   );
 }
-
