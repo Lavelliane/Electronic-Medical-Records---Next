@@ -5,18 +5,11 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import { DocumentData } from "firebase/firestore";
 import AtomicCard from "../atoms/Card";
+import { Service } from "../../types/types";
 
-type Category = {
-  name: string;
-  price: number;
-};
 
-interface Service {
-  title: string;
-  description: string;
-  imageUrl: string;
-  price?: number;
-  category?: Category[];
+type Prop = {
+  services: DocumentData;
 }
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -27,15 +20,16 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export default function ResponsiveGrid({ services }: DocumentData) {
+export default function ResponsiveGrid({ services }: Prop) {
   return (
     <Grid container spacing={2} sx={{m: 4}}>
-      {services.map((service: Service, id: number) => (
-        <Grid item key={id}>
+      {services.map((service: Service) => (
+        <Grid item key={service.id}>
             <AtomicCard
                 imageUrl={service.imageUrl}
                 title={service.title}
                 description={service.description}
+                id={service.id}
             />
         </Grid>
       ))}

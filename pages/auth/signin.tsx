@@ -63,7 +63,7 @@ export default function SignInSide() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: 'url(https://w.wallhaven.cc/full/ne/wallhaven-ne7om8.png)',
+            backgroundImage: 'url(https://e0.pxfuel.com/wallpapers/627/842/desktop-wallpaper-close-up-doctor-checking-patient-s-blood-pressure-2394527-stock-video-at-vecteezy-doctor-and-patient.jpg)',
             backgroundRepeat: 'no-repeat',
             backgroundColor: (t) =>
               t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],

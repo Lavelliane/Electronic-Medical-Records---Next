@@ -119,6 +119,9 @@ const Drawer = styled(MuiDrawer, {
 const mdTheme = createTheme();
 
 export default function Dashboard() {
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const handleOpen = () => setModalOpen(true);
+  const handleClose = () => setModalOpen(false);
   const router = useRouter();
   const { user, logout } = useAuth();
 
@@ -224,7 +227,7 @@ export default function Dashboard() {
           }}
         >
           <Toolbar />
-          <ResponsiveGrid services={docs}/>
+          <ResponsiveGrid services={docs} />
         </Box>
       </Box> 
     </ThemeProvider>
