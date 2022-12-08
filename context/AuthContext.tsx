@@ -17,7 +17,7 @@ type User = {
 
 export const AuthContextProvider = ({children} : {children: ReactNode}) => {
 
-    const [user, setUser] = useState<User | null>(null)
+    const [user, setUser] = useState<User>()
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -29,7 +29,7 @@ export const AuthContextProvider = ({children} : {children: ReactNode}) => {
                     }
                 )
             }else{
-                setUser(null)
+                console.log("No user found")
             }
         })
         return () => unsubscribe()
@@ -37,7 +37,6 @@ export const AuthContextProvider = ({children} : {children: ReactNode}) => {
 
 
     const logout = async () => {
-        setUser(null)
         await signOut(auth)
     }
     
