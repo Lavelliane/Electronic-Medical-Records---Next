@@ -10,6 +10,7 @@ import { Service } from "../../types/types";
 
 type Prop = {
   services: DocumentData;
+  email: string;
 }
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -20,7 +21,7 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export default function ResponsiveGrid({ services }: Prop) {
+export default function ResponsiveGrid({ services, email }: Prop) {
   return (
     <Grid container spacing={2} sx={{m: 4}}>
       {services.map((service: Service) => (
@@ -30,6 +31,7 @@ export default function ResponsiveGrid({ services }: Prop) {
                 title={service.title}
                 description={service.description}
                 id={service.id}
+                email={email}
             />
         </Grid>
       ))}

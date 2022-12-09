@@ -40,3 +40,32 @@ export const mainListItems = (
     </ListItemButton>
   </React.Fragment>
 );
+
+export const staffListItems = (
+  <React.Fragment>
+    <ListItemButton>
+      <ListItemIcon>
+        <DashboardIcon />
+      </ListItemIcon>
+      <Link href="/dashboard/">Dashboard</Link>
+    </ListItemButton>
+    <ListItemButton>
+      <ListItemIcon>
+        <ShoppingCartIcon />
+      </ListItemIcon>
+      <ListItemText primary="Services" />
+    </ListItemButton>
+    {/* <ListItemButton>
+      <ListItemIcon>
+        <PeopleIcon />
+      </ListItemIcon>
+      <Link href="/appointment/myappointments">My Appointments</Link>
+    </ListItemButton> */}
+    <ListItemButton>
+      <ListItemIcon>
+        <BarChartIcon />
+      </ListItemIcon>
+      <ListItemText primary="Logs" />
+    </ListItemButton>
+  </React.Fragment>
+);
