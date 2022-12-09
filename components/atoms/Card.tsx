@@ -11,13 +11,15 @@ type Props = {
   title: string;
   description: string;
   id: string;
+  email: string;
 };
 
 export default function AtomicCard({
   imageUrl,
   title,
   description,
-  id
+  id,
+  email
 }: Props) {
 
   return (
@@ -40,9 +42,17 @@ export default function AtomicCard({
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <Button size="small" color="primary" href={`/appointment/${id}`} >
-            Set Appointment
-          </Button>
+          
+          {email === 'staff@rajahtupas.com' && (
+            <Button size="small" color="primary" href={`/appointment/${id}`} >
+              View Appointments
+            </Button>
+          )}
+          {email !== 'staff@rajahtupas.com' && (
+            <Button size="small" color="primary" href={`/appointment/${id}`} >
+              Set Appointments
+            </Button>
+          )}
         </CardActions>
       </Card>
     </>
