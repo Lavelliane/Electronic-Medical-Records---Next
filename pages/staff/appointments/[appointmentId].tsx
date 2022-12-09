@@ -21,19 +21,24 @@ import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import {mainListItems, staffListItems}  from "../../../components/atoms/ListItems";
+import { mainListItems } from "../../../components/atoms/ListItems";
 import { yellow } from "@mui/material/colors";
 import axios from "axios";
 import { GetServerSideProps } from "next";
 import {
-  collection,
+  getFirestore,
   doc,
+  getDoc,
   DocumentData,
-  getDocs,
   onSnapshot,
+  query,
+  collection,
+  where,
+  getDocs,
 } from "firebase/firestore";
+import { useDocument } from "react-firebase-hooks/firestore";
 import { db } from "../../../lib/firebase";
-import ResponsiveGrid from "../../../components/organisms/ServicesGrid";
+import MyAppointmentsCard from "../../../components/atoms/MyAppointmentsCard";
 
 type Category = {
   name: string;
@@ -118,37 +123,35 @@ const Drawer = styled(MuiDrawer, {
 
 const mdTheme = createTheme();
 
-export default function StaffDashboard() {
-  const router = useRouter();
+export default function AppointmentView() {
   const { user, logout } = useAuth();
-
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  const router = useRouter();
+  const serviceId = router.query.appointmentId;
 
-  const { asPath } = useRouter();
+  const [appointments, setAppointments] = useState<any>([]);
 
   useEffect(() => {
-    if (!user) {
-      router.push("/auth/signin");
+    async function getAppointments(){
+        if (user !== undefined) {
+            const q = query(
+              collection(db, "appointments"),
+              where("serviceId", "==", serviceId)
+            );
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+              setAppointments((prevArr: any) => [...prevArr, doc.data()])
+            });
+        }
     }
-  }, []);
+    getAppointments()
+  }, [serviceId, user]);
 
-  const [docs, setdocs] = useState<DocumentData>([]);
+  console.log(appointments)
 
-  useEffect(() => {
-    const unsub = onSnapshot(collection(db, "services"), (querySnapshot) => {
-      const documents = querySnapshot.docs.map((doc) => {
-        return {
-          ...doc.data(),
-          id: doc.id,
-        };
-      });
-      setdocs(documents);
-    });
-    return () => unsub();
-  }, []);
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -209,7 +212,7 @@ export default function StaffDashboard() {
           </Toolbar>
           <Divider />
           <List component="nav">
-            {staffListItems}
+            {mainListItems}
             <Divider sx={{ my: 1 }} />
           </List>
         </Drawer>
@@ -226,9 +229,14 @@ export default function StaffDashboard() {
           }}
         >
           <Toolbar />
-          <ResponsiveGrid services={docs} email={user?.email}/>
+          {/* {appointments === undefined && (
+            <Typography variant="h5">No record found</Typography>
+          )}
+          {appointments !== undefined && (
+            <MyAppointmentsCard appointments={appointments} />
+          )} */}
         </Box>
-      </Box> 
+      </Box>
     </ThemeProvider>
   );
 }
