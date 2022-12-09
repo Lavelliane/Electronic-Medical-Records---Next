@@ -25,7 +25,13 @@ import { mainListItems } from "../../../components/atoms/ListItems";
 import { yellow } from "@mui/material/colors";
 import axios from "axios";
 import { GetServerSideProps } from "next";
-import { getFirestore, doc, getDoc, DocumentData } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  DocumentData,
+  onSnapshot,
+} from "firebase/firestore";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { db } from "../../../lib/firebase";
 import MyAppointmentsCard from "../../../components/atoms/MyAppointmentsCard";
@@ -114,40 +120,26 @@ const Drawer = styled(MuiDrawer, {
 const mdTheme = createTheme();
 
 export default function Dashboard() {
-
-  const router = useRouter();
   const { user, logout } = useAuth();
-  const [value, setValue] = useState<DocumentData>()
-
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
-  const { asPath } = useRouter();
+  const [appointments, setAppointments] = useState<any>([]);
 
   useEffect(() => {
-    if (!user) {
-      router.push("/auth/signin");
+    if (user !== undefined) {
+      const docRef = doc(db, "users", user?.uid);
+      const unsub = onSnapshot(docRef, (doc) => {
+        setAppointments(doc?.data()?.appointments);
+      });
+      return () => unsub();
     }
-  }, []);
+  }, [user]);
 
-  useEffect(() => {
-    async function getDocs(){
-        const docRef = doc(db, 'users', user?.uid)
-        const docSnap = await getDoc(docRef);
-        if(docSnap.exists() && user?.uid !== null) {
-            setAppointments(docSnap.data().appointments);
-        } else {
-            // doc.data() will be undefined in this case
-            console.log("No such document!");
-        }
-    }
-    getDocs()
-  },[])
   
-  const [appointments, setAppointments] = useState<any>([])
-  
+
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: "flex" }}>
@@ -223,8 +215,14 @@ export default function Dashboard() {
             overflow: "auto",
           }}
         >
-          <Toolbar /> 
-            <MyAppointmentsCard serviceDocId={appointments} />
+          <Toolbar />
+          {(appointments === undefined) &&
+            (<Typography variant="h5">No record found</Typography>)
+          }
+          {appointments !== undefined  && (
+            <MyAppointmentsCard appointments={appointments} />
+          )}
+          
         </Box>
       </Box>
     </ThemeProvider>
