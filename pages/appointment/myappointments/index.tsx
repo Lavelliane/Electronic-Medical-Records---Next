@@ -25,7 +25,13 @@ import { mainListItems } from "../../../components/atoms/ListItems";
 import { yellow } from "@mui/material/colors";
 import axios from "axios";
 import { GetServerSideProps } from "next";
-import { getFirestore, doc, getDoc, DocumentData, onSnapshot } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  DocumentData,
+  onSnapshot,
+} from "firebase/firestore";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { db } from "../../../lib/firebase";
 import MyAppointmentsCard from "../../../components/atoms/MyAppointmentsCard";
@@ -120,20 +126,20 @@ export default function Dashboard() {
     setOpen(!open);
   };
 
-  const [appointments, setAppointments] = useState<any>([])
+  const [appointments, setAppointments] = useState<any>([]);
 
   useEffect(() => {
-    if(user !== undefined){
-      const docRef = doc(db, 'users', user?.uid);
+    if (user !== undefined) {
+      const docRef = doc(db, "users", user?.uid);
       const unsub = onSnapshot(docRef, (doc) => {
-        setAppointments(doc?.data()?.appointments)
-      })
-      return () => unsub()
+        setAppointments(doc?.data()?.appointments);
+      });
+      return () => unsub();
     }
-    
-  },[user])
+  }, [user]);
+
   
-  console.log(appointments)
+
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: "flex" }}>
@@ -209,8 +215,14 @@ export default function Dashboard() {
             overflow: "auto",
           }}
         >
-          <Toolbar /> 
-            {appointments.length > 0 && <MyAppointmentsCard appointments={appointments} />}
+          <Toolbar />
+          {(appointments === undefined) &&
+            (<Typography variant="h5">No record found</Typography>)
+          }
+          {appointments !== undefined  && (
+            <MyAppointmentsCard appointments={appointments} />
+          )}
+          
         </Box>
       </Box>
     </ThemeProvider>

@@ -34,7 +34,7 @@ export default function Appointment({ appointments }: Props) {
                     {a.title}
                   </Typography>
                   <Typography variant="subtitle1" color="text.secondary">
-                    {a.price}
+                    PHP {a.price}.00
                   </Typography>
                   <Typography variant="subtitle1" paragraph>
                     {a.date}
