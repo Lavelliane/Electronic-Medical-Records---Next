@@ -154,6 +154,7 @@ export default function PatientDashboard() {
   }, []);
 
   return (
+    <>
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
@@ -196,6 +197,7 @@ export default function PatientDashboard() {
               Logout
             </Button>
           </Toolbar>
+          
         </AppBar>
         <Drawer variant="permanent" open={open}>
           <Toolbar
@@ -228,10 +230,13 @@ export default function PatientDashboard() {
             overflow: "auto",
           }}
         >
+          
           <Toolbar />
           <ResponsiveGrid services={docs} email={user?.email}/>
         </Box>
       </Box> 
     </ThemeProvider>
+    
+  </>
   );
 }

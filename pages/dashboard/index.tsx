@@ -15,7 +15,10 @@ export default function Dashboard() {
   }
   
   return (
-    <PatientDashboard />
+    <>
+      <PatientDashboard />
+    </>
+    
   )
   
 }

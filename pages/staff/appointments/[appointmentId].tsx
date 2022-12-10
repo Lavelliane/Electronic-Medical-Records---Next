@@ -39,6 +39,7 @@ import {
 import { useDocument } from "react-firebase-hooks/firestore";
 import { db } from "../../../lib/firebase";
 import MyAppointmentsCard from "../../../components/atoms/MyAppointmentsCard";
+import PatientAppointment from "../../../components/atoms/PatientAppointmentCard";
 
 type Category = {
   name: string;
@@ -143,12 +144,12 @@ export default function AppointmentView() {
             );
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
-              setAppointments((prevArr: any) => [...prevArr, doc.data()])
+              setAppointments([...appointments, doc.data()])
             });
         }
     }
     getAppointments()
-  }, [serviceId, user]);
+  }, []);
 
   console.log(appointments)
 
@@ -229,12 +230,12 @@ export default function AppointmentView() {
           }}
         >
           <Toolbar />
-          {/* {appointments === undefined && (
+          {appointments.length === 0 && (
             <Typography variant="h5">No record found</Typography>
           )}
-          {appointments !== undefined && (
-            <MyAppointmentsCard appointments={appointments} />
-          )} */}
+          {appointments .length > 0 && (
+            <PatientAppointment appointments={appointments} />
+          )}
         </Box>
       </Box>
     </ThemeProvider>
