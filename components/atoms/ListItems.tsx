@@ -38,6 +38,19 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Results" />
     </ListItemButton>
+    <ListItemButton>
+      <ListItemIcon>
+        <HelpIcon />
+      </ListItemIcon>
+      <Link
+        href="https://console.dialogflow.com/api-client/demo/embedded/bd6fd84e-6700-4568-8e4a-09e52556598e"
+        legacyBehavior
+      >
+        <a target="_blank" rel="noopener noreferrer" className="link-item">
+          Support
+        </a>
+      </Link>
+    </ListItemButton>
   </React.Fragment>
 );
 
