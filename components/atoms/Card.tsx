@@ -5,6 +5,7 @@ import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import { Button, CardActionArea, CardActions } from "@mui/material";
 import { DocumentData } from "firebase/firestore";
+import Link from "next/link";
 
 type Props = {
   imageUrl: string;
@@ -19,9 +20,8 @@ export default function AtomicCard({
   title,
   description,
   id,
-  email
+  email,
 }: Props) {
-
   return (
     <>
       <Card sx={{ maxWidth: 345, height: 340 }}>
@@ -42,14 +42,20 @@ export default function AtomicCard({
           </CardContent>
         </CardActionArea>
         <CardActions>
-          
-          {email === 'staff@rajahtupas.com' && (
-            <Button size="small" color="primary" href={`/appointment/${id}`} >
-              View Appointments
-            </Button>
+          {email === "staff@rajahtupas.com" && (
+            <Link
+              href={{
+                pathname: "/staff/appointments/[appointmentId]",
+                query: { appointmentId: id },
+              }}
+            >
+              <Button size="small" color="primary">
+                View Appointments
+              </Button>
+            </Link>
           )}
-          {email !== 'staff@rajahtupas.com' && (
-            <Button size="small" color="primary" href={`/appointment/${id}`} >
+          {email !== "staff@rajahtupas.com" && (
+            <Button size="small" color="primary" href={`/appointment/${id}`}>
               Set Appointments
             </Button>
           )}

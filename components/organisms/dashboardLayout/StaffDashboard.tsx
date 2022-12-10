@@ -119,9 +119,6 @@ const Drawer = styled(MuiDrawer, {
 const mdTheme = createTheme();
 
 export default function StaffDashboard() {
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const handleOpen = () => setModalOpen(true);
-  const handleClose = () => setModalOpen(false);
   const router = useRouter();
   const { user, logout } = useAuth();
 
