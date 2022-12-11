@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Button from "@mui/material/Button";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -21,7 +21,7 @@ import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { staffListItems } from "../../../components/atoms/ListItems";
+import { mainListItems } from "../../components/atoms/ListItems";
 import { yellow } from "@mui/material/colors";
 import axios from "axios";
 import { GetServerSideProps } from "next";
@@ -31,15 +31,11 @@ import {
   getDoc,
   DocumentData,
   onSnapshot,
-  query,
-  collection,
-  where,
-  getDocs,
 } from "firebase/firestore";
 import { useDocument } from "react-firebase-hooks/firestore";
-import { db } from "../../../lib/firebase";
-import MyAppointmentsCard from "../../../components/atoms/MyAppointmentsCard";
-import PatientAppointment from "../../../components/atoms/PatientAppointmentCard";
+import { db } from "../../lib/firebase";
+import MyAppointmentsCard from "../../components/atoms/MyAppointmentsCard";
+import MyResultsCard from "../../components/atoms/MyResultsCard";
 
 type Category = {
   name: string;
@@ -124,35 +120,26 @@ const Drawer = styled(MuiDrawer, {
 
 const mdTheme = createTheme();
 
-export default function AppointmentView() {
+export default function Dashboard() {
   const { user, logout } = useAuth();
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
-  const router = useRouter();
-  const serviceId = router.query.appointmentId;
 
-  const [appointments, setAppointments] = useState<any>([]);
+  const [results, setResults] = useState<any>([]);
 
   useEffect(() => {
-    async function getAppointments(){
-        if (user !== undefined) {
-            const q = query(
-              collection(db, "appointments"),
-              where("serviceId", "==", serviceId)
-            );
-            const querySnapshot = await getDocs(q);
-            querySnapshot.forEach((doc) => {
-              setAppointments((prevArr: any) => [...prevArr, doc.data()])
-            });
-        }
+    if (user !== undefined) {
+      const docRef = doc(db, "users", user?.uid);
+      const unsub = onSnapshot(docRef, (doc) => {
+        setResults(doc?.data()?.results);
+      });
+      return () => unsub();
     }
-    getAppointments()
-  }, [serviceId, user]);
+  }, [user]);
 
-  console.log(appointments)
-
+  
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -213,7 +200,7 @@ export default function AppointmentView() {
           </Toolbar>
           <Divider />
           <List component="nav">
-            {staffListItems}
+            {mainListItems}
             <Divider sx={{ my: 1 }} />
           </List>
         </Drawer>
@@ -230,11 +217,11 @@ export default function AppointmentView() {
           }}
         >
           <Toolbar />
-          {appointments.length === 0 && (
-            <Typography variant="h5">No record found</Typography>
-          )}
-          {appointments.length > 0 && (
-            <PatientAppointment appointments={appointments} />
+          {(results === undefined) &&
+            (<Typography variant="h5">No record found</Typography>)
+          }
+          {results !== undefined  && (
+            <MyResultsCard results={results} />
           )}
         </Box>
       </Box>
