@@ -15,6 +15,7 @@ type Appointment = {
   date: string;
   price: number;
   title: string;
+  status: string;
 };
 
 interface Props {
@@ -39,6 +40,21 @@ export default function Appointment({ appointments }: Props) {
                   <Typography variant="subtitle1" paragraph>
                     {a.date}
                   </Typography>
+                  {a.status === "pending" ? (
+                    <>
+                      <Typography
+                        variant="subtitle2"
+                        color={"orange"}
+                        paragraph
+                      >
+                        Pending
+                      </Typography>
+                    </>
+                  ) : (
+                    <Typography variant="subtitle2" color={"green"} paragraph>
+                      Complete
+                    </Typography>
+                  )}
                 </CardContent>
               </Card>
             </CardActionArea>

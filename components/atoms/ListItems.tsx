@@ -34,9 +34,9 @@ export const mainListItems = (
     </ListItemButton>
     <ListItemButton>
       <ListItemIcon>
-        <BarChartIcon />
+        <PeopleIcon />
       </ListItemIcon>
-      <ListItemText primary="Results" />
+      <Link href="/results/">Results</Link>
     </ListItemButton>
     <ListItemButton>
       <ListItemIcon>

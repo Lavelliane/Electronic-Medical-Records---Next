@@ -10,6 +10,12 @@ export interface PatientDetails {
     age: number | null;
     country: string;
 }
+export interface ResultDetails {
+    staffFirstName: string;
+    staffLastName: string;
+    staffRemarks: string;
+
+}
 
 
 export interface UserCredentials {

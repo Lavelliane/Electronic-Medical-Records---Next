@@ -13,16 +13,15 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import AddressForm from "./AddressForm";
-import PaymentForm from "./PaymentForm";
 import Review from "./Review";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { db } from "../../../lib/firebase";
-import { PatientDetails } from "../../../types/types";
+import { ResultDetails } from "../../../types/types";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { useAuth } from '../../../context/AuthContext';
-import { v4 as uuidv4 } from 'uuid';
+import { useAuth } from "../../../context/AuthContext";
+import { v4 as uuidv4 } from "uuid";
 
 function Copyright() {
   return (
@@ -37,20 +36,19 @@ function Copyright() {
   );
 }
 
-const steps = ["Patient Information", "Payment details", "Review"];
+const steps = ["Patient Information", "Confirm Results"];
 
 const theme = createTheme();
 
-export default function Checkout() {
- const {user} = useAuth()
-  const [patient, setPatient] = useState<PatientDetails | null>(null);
+export default function Release() {
+  const { user } = useAuth();
+  const [result, setResult] = useState<ResultDetails | null>(null);
   const { asPath } = useRouter();
-  const id = asPath.split("/")[2];
-  //  console.log(id)
+  const id = asPath.split("/")[4];
+  console.log(id);
   const [activeStep, setActiveStep] = React.useState(0);
 
-  const [value, loading, error] = useDocument(doc(db, "services", id));
-  
+  const [value, loading, error] = useDocument(doc(db, "appointments", id));
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -59,39 +57,47 @@ export default function Checkout() {
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
-  console.log(patient);
+  console.log(result);
 
-  async function addDataToAppointments(id: string) {
-    const appointmentId = uuidv4().slice(0,10)
-    await setDoc(doc(db, "appointments", appointmentId), {
-      ...patient,
-      date: patient?.date?.toString(),
-      serviceId: id,
-      serviceTitle: value?.data()?.title,
-      userId: user?.uid,
-      appointmentId,
-      status: "pending",
+  async function addDataToResults(id: string) {
+    await setDoc(doc(db, "results", id), {
+      ...result,
+      appointmentId: id,
+      patientId: value?.data()?.userId,
+      serviceTitle: value?.data()?.serviceTitle,
+      name: value?.data()?.firstName + value?.data()?.lastName,
+      date: value?.data()?.date,
     });
-    if(user?.uid !== null){
-        //get current appointment array of target user
-        const docRef = doc(db, "users", user?.uid);
-        const docSnap = await getDoc(docRef);
+    if (id !== null && value?.data()?.userId !== null) {
+      //get current appointment array of target user
+      const docRef = doc(db, "appointments", id);
 
-        //update array
-        const appointmentData = {
-            appointmentId,
-            title: value?.data()?.title,
-            date: patient?.date?.toString(),
-            price: value?.data()?.price,
-            status: "pending",
-        }
-        console.log(appointmentData)
-        await updateDoc(doc(db, "users", user?.uid), {
-            appointments: [...docSnap?.data()?.appointments, appointmentData]
-        });
+      //change appointment status to complete
+      await updateDoc(docRef, {
+        status: "complete",
+      });
+
+      //UPDATE USER RESULTS ARRAY
+      const userRef = doc(db, "users", value?.data()?.userId);
+      const docSnapUser = await getDoc(userRef);
+      await updateDoc(userRef, {
+        results: [
+          ...docSnapUser?.data()?.results,
+          { 
+            ...result, 
+            appointmentId: id,
+            patientId: value?.data()?.userId,
+            serviceTitle: value?.data()?.serviceTitle,
+            name: value?.data()?.firstName + " " + value?.data()?.lastName,
+            date: value?.data()?.date,
+          },
+        ],
+        appointments: docSnapUser
+          ?.data()
+          ?.appointments.filter((a: any) => a.appointmentId !== id),
+      });
+      handleNext();
     }
-    
-    handleNext();
   }
 
   return (
@@ -120,7 +126,8 @@ export default function Checkout() {
           sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}
         >
           <Typography component="h1" variant="h4" align="center">
-            Appointment for {value?.data()?.title}
+            Release Results for {value?.data()?.firstName}{" "}
+            {value?.data()?.lastName}
           </Typography>
           <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
             {steps.map((label) => (
@@ -135,20 +142,15 @@ export default function Checkout() {
                 Appointment Confirmed
               </Typography>
               <Typography variant="subtitle1">
-                Thank you for trusting Rajah Tupas Medical Services. Please visit the
-                clinic at your specified time. You may now close this window
+                Results released successfully for appointment{" "}
+                {value?.data()?.appointmentId}
               </Typography>
             </React.Fragment>
           ) : (
             <React.Fragment>
-              {activeStep == 0 && <AddressForm patientFunc={setPatient} />}
-              {activeStep == 1 && <PaymentForm />}
-              {activeStep == 2 && (
-                <Review
-                  service={value?.data()?.title}
-                  price={value?.data()?.price}
-                />
-              )}
+              {activeStep == 0 && <AddressForm patientFunc={setResult} />}
+              {activeStep == 1 && <Review />}
+
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                 {activeStep !== 0 && (
                   <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
@@ -167,7 +169,9 @@ export default function Checkout() {
                 {activeStep === steps.length - 1 && (
                   <Button
                     variant="contained"
-                    onClick={() => addDataToAppointments(id)}
+                    onClick={() =>
+                      addDataToResults(value?.data()?.appointmentId)
+                    }
                     sx={{ mt: 3, ml: 1 }}
                   >
                     Confirm
