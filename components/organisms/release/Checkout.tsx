@@ -139,7 +139,7 @@ export default function Release() {
           {activeStep === steps.length ? (
             <React.Fragment>
               <Typography variant="h5" gutterBottom>
-                Appointment Confirmed
+                Results Released
               </Typography>
               <Typography variant="subtitle1">
                 Results released successfully for appointment{" "}

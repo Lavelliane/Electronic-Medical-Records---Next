@@ -9,7 +9,7 @@ export default function Review() {
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
-        Order summary
+        Release Confirmation
       </Typography>
       <List disablePadding>
         <Typography variant="subtitle1" sx={{ fontWeight: 400 }}>
