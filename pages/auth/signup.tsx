@@ -48,6 +48,7 @@ export default function SignUp() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await signup(email, password);
+    router.push('/auth/signin');
   };
   useEffect(() => {
     if(user){
